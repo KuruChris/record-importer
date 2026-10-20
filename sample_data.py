@@ -7,13 +7,12 @@ class SampleRecord(TypedDict):
     external_id: str
     name: str
 
-
+# Uncomment the following lines to add more sample records for testing purposes.
 SAMPLE_RECORDS: list[SampleRecord] = [
     {"external_id": "SB-1001", "name": "Notebook"},
     {"external_id": "SB-1002", "name": "Pencil Case"},
     {"external_id": "SB-1003", "name": "Backpack"},
     {"external_id": "SB-1004", "name": "Folder"},
-    # Uncomment the following lines to add more sample records for testing purposes.
     # {"external_id": "SB-1005", "name": "Eraser"},
     # {"external_id": "SB-1006", "name": "Ruler"},
     # {"external_id": "SB-1007", "name": "Pencil"},

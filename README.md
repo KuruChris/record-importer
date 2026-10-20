@@ -80,7 +80,4 @@ No jitter on the backoff (it matters with many parallel workers, not one importe
 input-validation layer beyond the database constraints, and no persistence of the budget.
 
 ## AI tools disclosure
-
-> TODO: state honestly which AI tools you used and what for (for example: "I used <tool> to
-> <review my first version / suggest a simpler structure / ...>. I wrote or reviewed and
-> can explain every part of the code.").
+1. Claude Code (CLI) – Claude Opus 5.5: Mostlty used as an AI-assisted development for code refactoring, improving code readability and maintainability while maintaining strict rules/guardrails. All AI suggestions and code changes was reviewed, validated and tested before being incorporated in the codebase.
