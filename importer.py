@@ -2,9 +2,7 @@
 import time
 from dataclasses import dataclass, field
 
-# The service accepts at most 25 records per request.
 BATCH_SIZE = 25
-# The service allows at most 100 requests per day.
 DAILY_REQUEST_LIMIT = 100
 # Retries after the first attempt, so a batch gets at most 5 attempts.
 MAX_RETRIES = 4
