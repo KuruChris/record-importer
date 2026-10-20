@@ -20,10 +20,17 @@ If that command is not recognized on Windows, try `py --version`. Use `py` inste
 Install the test dependency and run the example and tests:
 
 ```bash
-python importer.py     # runs the example with the four starter records
+python main.py         # runs the example with the four starter records
 pip install pytest
 pytest -q              # all external calls are mocked; no network, no real database
 ```
+
+## Project structure
+
+- `importer.py` contains batching, request limits, and retry behavior.
+- `storage.py` contains the SQLite schema and `SQLiteStore` upsert implementation.
+- `main.py` wires the sample data, importer, and in-memory store for the runnable demo.
+- `sample_data.py` contains the starter records.
 
 ## Assumptions
 

@@ -5,15 +5,16 @@ import pytest
 from importer import (
     BATCH_SIZE,
     RateLimitError,
-    SQLiteStore,
     TemporaryAPIError,
     import_records,
 )
 from sample_data import SAMPLE_RECORDS
+from storage import SQLiteStore
 
 # Expectations are derived from SAMPLE_RECORDS, so the tests keep working if you add data.
 EXPECTED_ROWS = sorted((r["external_id"], r["name"]) for r in SAMPLE_RECORDS)
-BATCHES = -(-len(SAMPLE_RECORDS) // BATCH_SIZE)  # ceiling division: 4 -> 1, 30 -> 2, 51 -> 3
+# Ceiling division gives the number of batches needed for the sample.
+BATCHES = -(-len(SAMPLE_RECORDS) // BATCH_SIZE)
 
 
 def no_sleep(_seconds):
@@ -65,7 +66,8 @@ def test_temporary_error_is_retried_with_exponential_backoff(store):
     result = import_records(SAMPLE_RECORDS, api, store, sleep=sleeps.append)
     assert sleeps == [1.0, 2.0]
     assert result.saved == len(SAMPLE_RECORDS)
-    assert result.requests == 2 + BATCHES  # 2 failed attempts + 1 successful request per batch
+    # Two failed attempts plus one successful request for each batch.
+    assert result.requests == 2 + BATCHES
 
 
 def test_429_waits_for_retry_after(store):
@@ -79,7 +81,8 @@ def test_gives_up_after_max_retries(store):
     api = fake_api(*[TemporaryAPIError()] * 10)
     with pytest.raises(TemporaryAPIError):
         import_records(SAMPLE_RECORDS, api, store, sleep=no_sleep, max_retries=2)
-    assert len(api.batch_sizes) == 3  # first attempt + 2 retries
+    # One initial attempt plus two retries.
+    assert len(api.batch_sizes) == 3
     assert rows(store) == []
 
 
@@ -93,7 +96,8 @@ def test_does_not_wait_when_retry_after_is_too_long(store):
 
 def test_daily_limit_counts_failed_attempts_and_returns_the_rest(store):
     records = make_records(60)
-    api = fake_api(TemporaryAPIError())  # 1st attempt fails, so 2 requests deliver only 1 batch
+    # The first attempt fails, so two requests deliver only one batch.
+    api = fake_api(TemporaryAPIError())
     result = import_records(records, api, store, sleep=no_sleep, max_requests=2)
     assert (result.requests, result.saved) == (2, 25)
     assert result.remaining == records[25:]
@@ -103,7 +107,8 @@ def test_does_not_wait_for_a_retry_it_cannot_afford(store):
     sleeps = []
     api = fake_api(*[TemporaryAPIError()] * 10)
     result = import_records(SAMPLE_RECORDS, api, store, sleep=sleeps.append, max_requests=2)
-    assert sleeps == [1.0]  # one wait between the 2 attempts, none after the budget is gone
+    # Wait between the two attempts, but not after the budget is gone.
+    assert sleeps == [1.0]
     assert result.remaining == SAMPLE_RECORDS
 
 
